@@ -1,0 +1,40 @@
+﻿<Page x:Class="MGM_Launcherv1._0.pages.SurvivalServersPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:MGM_Launcherv1._0.pages"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="SurvivalServersPage">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="46"/>
+            <!-- Row for Buttons -->
+            <RowDefinition Height="*"/>
+            <!-- Remaining space for ContentFrame -->
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Buttons -->
+        <Button Content="Rust" Grid.Column="0" Height="36" Margin="5"/>
+        <Button Content="Ark" Grid.Column="1" Height="36" Margin="5"/>
+        <Button Content="Coming Soon" Grid.Column="2" Height="36" Margin="5" Visibility="Hidden"/>
+        <Button Content="Coming Soon" Grid.Column="3" Height="36" Margin="5" Visibility="Hidden"/>
+        <Button Content="Coming Soon" Grid.Column="4" Height="36" Margin="5" Visibility="Hidden"/>
+        <Button Content="Coming Soon" Grid.Column="5" Height="36" Margin="5" Visibility="Hidden"/>
+        <Button Content="Coming Soon" Grid.Column="6" Height="36" Margin="5" Visibility="Hidden"/>
+
+        <!-- Content Frame -->
+        <Frame Name="ContentFrame" Grid.Row="1" Grid.ColumnSpan="7" NavigationUIVisibility="Hidden" Margin="0,10,0,0"/>
+    </Grid>
+</Page>
