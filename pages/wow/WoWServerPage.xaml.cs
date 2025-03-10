@@ -12,6 +12,9 @@ namespace MGM_Launcherv1._0
     /// </summary>
     public partial class WoWServerPage : Page
     {
+        private WoWPageViewModel _WoWPageViewModel;
+        private DownloadItem _DownloadItem;
+
         MMOServersPage? mw;
         
         public bool WoWInstalled = false;
@@ -19,7 +22,11 @@ namespace MGM_Launcherv1._0
         public WoWServerPage()
         {
             InitializeComponent();
+            _WoWPageViewModel = new WoWPageViewModel();
+            DataContext = _WoWPageViewModel;
             setButtonText();
+            CheckWoWInstallDirectory();
+            SetDirectoryPathText(ConfigVariables.WoWInstallDirectory);
         }
 
         /// <summary>
@@ -31,6 +38,11 @@ namespace MGM_Launcherv1._0
             {
                 System.Windows.MessageBox.Show("WoW install directory is not set. Please select the directory.", "Configuration Required", MessageBoxButton.OK, MessageBoxImage.Warning);
                 SelectWoWDirectory();
+            }
+            else
+            {
+                WoWDirSet = true;
+                SetDirectoryPathText(ConfigVariables.WoWInstallDirectory);
             }
         }
 
@@ -54,6 +66,7 @@ namespace MGM_Launcherv1._0
                     WoWDirSet = true;
                     ConfigManager.SaveConfig();
                     mw.WoWServerPageRefresh();
+                    SetDirectoryPathText(ConfigVariables.WoWInstallDirectory);
 
                 }
                 else
@@ -77,18 +90,34 @@ namespace MGM_Launcherv1._0
                 PlayInstallUpdate.Content = "Install";
             }
         }
+        public void changeDirectoryClick(object sender, RoutedEventArgs e)
+        {
+            SelectWoWDirectory();
+        }
+        private async void StartDownload()
+        {
+            var progress = new Progress<DownloadItem>(item =>
+            {
+                 _DownloadItem = item;
+            });
+
+            await ManifestManager.CheckAndUpdateFiles(progress);
+        }
+
         public async void PlayInstallUpdateClick(object sender, RoutedEventArgs e)
         {
             CheckWoWInstallDirectory();
+            //StartDownload();
+            await _WoWPageViewModel.StartDownload();
             // Create a new Progress<int> object
-            var progress = new Progress<int>(value =>
-            {
-                // Update the progress bar value
-                DownloadProgressBar.Value = value;
-            });
+            //var progress = new Progress<int>(value =>
+            // {
+            //     // Update the progress bar value
+            //     DownloadProgressBar.Value = value;
+            //  });
 
             // Call the method to check and update files
-            await ManifestManager.CheckAndUpdateFiles(progress);
+            // await ManifestManager.CheckAndUpdateFiles(progress);
         }
 
         public void SetDirectoryPathText(string path)

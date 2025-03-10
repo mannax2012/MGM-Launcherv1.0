@@ -33,8 +33,8 @@ namespace MGM_Launcherv1._0
             }
             else
             {
-                System.Windows.MessageBox.Show($"Config file found. Loading settings...{ConfigVariables.WoWInstallDirectory}", "Configuration", MessageBoxButton.OK, MessageBoxImage.Information);
                 LoadConfig();
+                System.Windows.MessageBox.Show($"Config file found. Loading settings...ConfigTest: {ConfigVariables.WoWInstallDirectory}", "Configuration", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
 

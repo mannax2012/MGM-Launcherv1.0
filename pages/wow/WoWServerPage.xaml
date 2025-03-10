@@ -14,8 +14,9 @@
     <Grid>
         <Button x:Name="PlayInstallUpdate" Content="Install" HorizontalAlignment="Left" Margin="634,363,0,0" Click="PlayInstallUpdateClick" VerticalAlignment="Top" Width="156" Height="52"/>
         <TextBlock x:Name="FileText" HorizontalAlignment="Left" Margin="10,399,0,0" TextWrapping="Wrap" Text="File Progress" VerticalAlignment="Top" Width="606" TextAlignment="Center"/>
-        <ProgressBar x:Name="DownloadProgressBar" HorizontalAlignment="Center" Height="20" Margin="0,420,0,0" VerticalAlignment="Top" Width="780"/>
+        <ProgressBar x:Name="DownloadProgressBar" Value="0.5" HorizontalAlignment="Center" Height="20" Margin="0,420,0,0" VerticalAlignment="Top" Width="780"/>
         <TextBlock x:Name="DirectoryPathText" HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="702" FontWeight="Bold" FontSize="18"/>
+        <Button x:Name="PlayInstallUpdate_Copy" Content="Change Directory" HorizontalAlignment="Left" Margin="634,340,0,0" Click="changeDirectoryClick" VerticalAlignment="Top" Width="156" Height="20"/>
 
     </Grid>
 </Page>
