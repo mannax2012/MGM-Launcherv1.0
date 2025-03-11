@@ -26,16 +26,21 @@ namespace MGM_Launcherv1._0.pages
         {
             InitializeComponent();
             ContentFrame.Navigate(WowPage);
+            WowPage.setButtonText();
         }
         public void WoWServerPageClick(object sender, RoutedEventArgs e)
         {
-            ContentFrame.Navigate(new WoWServerPage()); 
             WowPage.CheckWoWInstallDirectory();
+            WowPage.StartDownload();
+            WowPage.setButtonText();
         }
         public void WoWServerPageRefresh()
         {
             ContentFrame.Navigate(new WoWServerPage());
+            
             WowPage.CheckWoWInstallDirectory();
+            WowPage.StartDownload();
+            WowPage.setButtonText();
         }
 
     }

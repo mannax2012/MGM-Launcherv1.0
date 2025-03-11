@@ -13,7 +13,7 @@ namespace MGM_Launcherv1._0
     public static class ConfigVariables
     {
         public static string WoWInstallDirectory = "";
-        public static int Setting2 = 100;
+        public static bool WoWInstalled = false;
         public static bool Setting3 = true;
     }
 

@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 
 namespace MGM_Launcherv1._0
 {
+
     public class DownloadItem
     {
         public string FileName { get; set; }
@@ -36,6 +37,9 @@ namespace MGM_Launcherv1._0
         private static readonly string BaseUrl = "http://localhost/website/wordpress/launcher/WoW/WoWLK/";
         private static readonly string ManifestFile = "manifest.json";
         private static readonly string InstallDirectory = ConfigVariables.WoWInstallDirectory;
+        public static bool WoWInstalled = false;
+        public static bool WoWUpdate = false;
+
 
         public static async Task CheckAndUpdateFiles(IProgress<DownloadItem> progress)
         {
@@ -52,22 +56,24 @@ namespace MGM_Launcherv1._0
                 {
                     string localFilePath = Path.Combine(InstallDirectory, file.Path);
                     string directoryPath = Path.GetDirectoryName(localFilePath); // Get the directory portion
-
-                    // Ensure the directory exists
-                    if (!Directory.Exists(directoryPath))
-                    {
-                        Directory.CreateDirectory(directoryPath);
-                    }
                     bool needsDownload = !File.Exists(localFilePath) || !VerifyFileHash(localFilePath, file.Hash);
 
                     if (needsDownload)
                     {
+                        // Ensure the directory exists
+                        if (!Directory.Exists(directoryPath))
+                        {
+                            Directory.CreateDirectory(directoryPath);
+                        }
                         string downloadUrl = BaseUrl + file.Path;
                         await DownloadFileWithProgress(downloadUrl, localFilePath, file.Size, progress);
                     }
                 }
 
-                System.Windows.MessageBox.Show("Update check complete!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                WoWInstalled = true;
+                ConfigVariables.WoWInstalled = WoWInstalled;
+                ConfigManager.SaveConfig();
+                System.Windows.MessageBox.Show($"Update check complete! WoWInstalled: {WoWInstalled}", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
             {

@@ -4,6 +4,9 @@ using System.Windows.Controls;
 using Microsoft.Win32; // For file/folder selection
 using System.Windows.Forms;
 using MGM_Launcherv1._0.pages;
+using System.Diagnostics;
+using System.IO;
+using System.IO;
 
 namespace MGM_Launcherv1._0
 {
@@ -17,21 +20,19 @@ namespace MGM_Launcherv1._0
 
         MMOServersPage? mw;
         
-        public bool WoWInstalled = false;
+        public bool WoWInstalled = ManifestManager.WoWInstalled;
         public bool WoWDirSet = false;
         public WoWServerPage()
         {
+            WoWInstalled = ConfigVariables.WoWInstalled;
             InitializeComponent();
             _WoWPageViewModel = new WoWPageViewModel();
             DataContext = _WoWPageViewModel;
-            setButtonText();
             CheckWoWInstallDirectory();
             SetDirectoryPathText(ConfigVariables.WoWInstallDirectory);
+            setButtonText();
         }
 
-        /// <summary>
-        /// Checks if the WoW install directory is set; if not, prompts the user to select one.
-        /// </summary>
         public void CheckWoWInstallDirectory()
         {
             if (string.IsNullOrWhiteSpace(ConfigVariables.WoWInstallDirectory))
@@ -89,12 +90,16 @@ namespace MGM_Launcherv1._0
             {
                 PlayInstallUpdate.Content = "Install";
             }
+            else if (!WoWDirSet)
+            {
+                PlayInstallUpdate.Content = "Select Directory";
+            }
         }
         public void changeDirectoryClick(object sender, RoutedEventArgs e)
         {
             SelectWoWDirectory();
         }
-        private async void StartDownload()
+        public async void StartDownload()
         {
             var progress = new Progress<DownloadItem>(item =>
             {
@@ -106,18 +111,41 @@ namespace MGM_Launcherv1._0
 
         public async void PlayInstallUpdateClick(object sender, RoutedEventArgs e)
         {
-            CheckWoWInstallDirectory();
-            //StartDownload();
-            await _WoWPageViewModel.StartDownload();
-            // Create a new Progress<int> object
-            //var progress = new Progress<int>(value =>
-            // {
-            //     // Update the progress bar value
-            //     DownloadProgressBar.Value = value;
-            //  });
+            WoWInstalled = ConfigVariables.WoWInstalled;
+            if (WoWDirSet && WoWInstalled)
+            {
+                string exePath = Path.Combine(ConfigVariables.WoWInstallDirectory, "Wow.exe");
 
-            // Call the method to check and update files
-            // await ManifestManager.CheckAndUpdateFiles(progress);
+                if (File.Exists(exePath))
+                {
+                    Process.Start(new ProcessStartInfo
+                    {
+                        FileName = exePath,
+                        UseShellExecute = true,  // Ensures it opens normally like clicking in Explorer
+                        WorkingDirectory = Path.GetDirectoryName(exePath) // Set working directory
+                    });
+                }
+                else
+                {
+                    System.Windows.MessageBox.Show("Game executable not found!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+            else
+            {
+                CheckWoWInstallDirectory();
+                //StartDownload();
+                await _WoWPageViewModel.StartDownload();
+                setButtonText();
+                // Create a new Progress<int> object
+                //var progress = new Progress<int>(value =>
+                // {
+                //     // Update the progress bar value
+                //     DownloadProgressBar.Value = value;
+                //  });
+
+                // Call the method to check and update files
+                // await ManifestManager.CheckAndUpdateFiles(progress);
+            }
         }
 
         public void SetDirectoryPathText(string path)
