@@ -14,7 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace MGM_Launcherv1._0.pages
+namespace MGM_Launcherv1._0
 {
     /// <summary>
     /// Interaction logic for MMOServersPage.xaml
@@ -37,9 +37,6 @@ namespace MGM_Launcherv1._0.pages
         public void WoWServerPageRefresh()
         {
             ContentFrame.Navigate(new WoWServerPage());
-            
-            WowPage.CheckWoWInstallDirectory();
-            WowPage.StartDownload();
             WowPage.setButtonText();
         }
 

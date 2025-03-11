@@ -6,29 +6,24 @@ using System.Windows.Forms;
 using MGM_Launcherv1._0.pages;
 using System.Diagnostics;
 using System.IO;
-using System.IO;
 
 namespace MGM_Launcherv1._0
 {
-    /// <summary>
-    /// Interaction logic for WoWServerPage.xaml
-    /// </summary>
     public partial class WoWServerPage : Page
     {
-        private WoWPageViewModel _WoWPageViewModel;
-        private DownloadItem _DownloadItem;
+        private WoWPageViewModel? _WoWPageViewModel;
+        private DownloadItem? _DownloadItem;
 
         MMOServersPage? mw;
         
-        public bool WoWInstalled = ManifestManager.WoWInstalled;
+        public bool WoWInstalled = ConfigVariables.WoWInstalled;
         public bool WoWDirSet = false;
         public WoWServerPage()
         {
-            WoWInstalled = ConfigVariables.WoWInstalled;
             InitializeComponent();
             _WoWPageViewModel = new WoWPageViewModel();
             DataContext = _WoWPageViewModel;
-            CheckWoWInstallDirectory();
+            //CheckWoWInstallDirectory();
             SetDirectoryPathText(ConfigVariables.WoWInstallDirectory);
             setButtonText();
         }
@@ -56,24 +51,21 @@ namespace MGM_Launcherv1._0
             using (FolderBrowserDialog folderDialog = new FolderBrowserDialog())
             {
                 folderDialog.Description = "Select your World of Warcraft installation directory";
-                folderDialog.ShowNewFolderButton = false;
+                folderDialog.ShowNewFolderButton = true;
 
                 if (folderDialog.ShowDialog() == DialogResult.OK)
                 {
                     ConfigVariables.WoWInstallDirectory = folderDialog.SelectedPath;
-                    ConfigManager.SaveConfig(); // Save to config.cfg
-
+                    
                     System.Windows.MessageBox.Show($"WoW install directory set to:\n{ConfigVariables.WoWInstallDirectory}", "Directory Saved", MessageBoxButton.OK, MessageBoxImage.Information);
                     WoWDirSet = true;
-                    ConfigManager.SaveConfig();
-                    mw.WoWServerPageRefresh();
                     SetDirectoryPathText(ConfigVariables.WoWInstallDirectory);
+                    ConfigManager.SaveConfig();
 
                 }
                 else
                 {
                     System.Windows.MessageBox.Show("No directory selected. Some features may not work properly.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    WoWInstalled = false;
                     WoWDirSet = false;
                     SetDirectoryPathText(ConfigVariables.WoWInstallDirectory);
                 }
@@ -82,11 +74,11 @@ namespace MGM_Launcherv1._0
         }
         public void setButtonText()
         {
-            if (WoWInstalled)
+            if (ConfigVariables.WoWInstalled)
             {
                 PlayInstallUpdate.Content = "Play";
             }
-            else if (WoWDirSet && !WoWInstalled)
+            else if (WoWDirSet && !ConfigVariables.WoWInstalled)
             {
                 PlayInstallUpdate.Content = "Install";
             }
@@ -99,16 +91,24 @@ namespace MGM_Launcherv1._0
         {
             SelectWoWDirectory();
         }
+
         public async void StartDownload()
         {
-            var progress = new Progress<DownloadItem>(item =>
-            {
-                 _DownloadItem = item;
-            });
-
-            await ManifestManager.CheckAndUpdateFiles(progress);
+            VerifyFilesButton.IsEnabled = false;
+            PlayInstallUpdate.IsEnabled = false;
+            await _WoWPageViewModel.StartDownload();
+            VerifyFilesButton.IsEnabled = true;
+            PlayInstallUpdate.IsEnabled = true;
         }
-
+        public void StopDownload()
+        {
+            VerifyFilesButton.IsEnabled = true;
+            PlayInstallUpdate.IsEnabled = true;
+        }
+        public void verifyClick(object sender, RoutedEventArgs e)
+        {
+                StartDownload();
+        }
         public async void PlayInstallUpdateClick(object sender, RoutedEventArgs e)
         {
             WoWInstalled = ConfigVariables.WoWInstalled;
@@ -133,8 +133,7 @@ namespace MGM_Launcherv1._0
             else
             {
                 CheckWoWInstallDirectory();
-                //StartDownload();
-                await _WoWPageViewModel.StartDownload();
+                StartDownload();
                 setButtonText();
                 // Create a new Progress<int> object
                 //var progress = new Progress<int>(value =>

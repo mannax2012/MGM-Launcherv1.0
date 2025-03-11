@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Net.Http;
 using System.Security.Cryptography;
@@ -10,15 +11,81 @@ using Newtonsoft.Json;
 namespace MGM_Launcherv1._0
 {
 
-    public class DownloadItem
+    public class DownloadItem : INotifyPropertyChanged
     {
-        public string FileName { get; set; }
-        public long FileSize { get; set; }
-        public long BytesRemaining { get; set; }
-        public double ProgressPercentage => FileSize > 0 ? (1 - (double)BytesRemaining / FileSize) * 100 : 0;
+        private string _fileName;
+        private long _fileSize;
+        private long _bytesRemaining;
+        private double _progressPercentage;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public string FileName
+        {
+            get => _fileName;
+            set
+            {
+                if (_fileName != value)
+                {
+                    _fileName = value;
+                    OnPropertyChanged(nameof(FileName));
+                }
+            }
+        }
+
+        public long FileSize
+        {
+            get => _fileSize;
+            set
+            {
+                if (_fileSize != value)
+                {
+                    _fileSize = value;
+                    OnPropertyChanged(nameof(FileSize));
+                    UpdateProgress(); // Update progress when file size changes
+                }
+            }
+        }
+
+        public long BytesRemaining
+        {
+            get => _bytesRemaining;
+            set
+            {
+                if (_bytesRemaining != value)
+                {
+                    _bytesRemaining = value;
+                    OnPropertyChanged(nameof(BytesRemaining));
+                    UpdateProgress(); // Update progress when remaining bytes change
+                }
+            }
+        }
+
+        public double ProgressPercentage
+        {
+            get => _progressPercentage;
+            private set
+            {
+                if (_progressPercentage != value)
+                {
+                    _progressPercentage = value;
+                    OnPropertyChanged(nameof(ProgressPercentage));
+                }
+            }
+        }
+
+        private void UpdateProgress()
+        {
+            ProgressPercentage = FileSize > 0 ? (1 - (double)BytesRemaining / FileSize) * 100 : 0;
+        }
+
+        private void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
     }
 
-    public class ManifestFile
+        public class ManifestFile
     {
         public string Name { get; set; }
         public string Path { get; set; }
@@ -43,6 +110,9 @@ namespace MGM_Launcherv1._0
 
         public static async Task CheckAndUpdateFiles(IProgress<DownloadItem> progress)
         {
+            WoWServerPage woWServerPage = new WoWServerPage();
+            woWServerPage.PlayInstallUpdate.IsEnabled = false;
+            woWServerPage.VerifyFilesButton.IsEnabled = false;
             try
             {
                 ManifestData manifest = await DownloadManifest();
@@ -69,7 +139,7 @@ namespace MGM_Launcherv1._0
                         await DownloadFileWithProgress(downloadUrl, localFilePath, file.Size, progress);
                     }
                 }
-
+                
                 WoWInstalled = true;
                 ConfigVariables.WoWInstalled = WoWInstalled;
                 ConfigManager.SaveConfig();

@@ -1,9 +1,11 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace MGM_Launcherv1._0
 {
@@ -13,31 +15,13 @@ namespace MGM_Launcherv1._0
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public DownloadItem DownloadProgress
-        {
-            get => _downloadProgress;
-            set
-            {
-                if (_downloadProgress != value)
-                {
-                    _downloadProgress = value;
-                    OnPropertyChanged(nameof(DownloadProgress));
-                }
-            }
-        }
-
-        private void OnPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
         public async Task StartDownload()
         {
             var progress = new Progress<DownloadItem>(item =>
             {
-                DownloadProgress = item;
+                DownloadItem _progressPercentage = item;
             });
-
+            //System.Windows.MessageBox.Show($"Download Progress: {DownloadProgress}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             await ManifestManager.CheckAndUpdateFiles(progress);
         }
     }
